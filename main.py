@@ -11,6 +11,7 @@ from langchain.schema import (
     BaseMessage,
 )
 
+
 class CAMELAgent:
 
     def __init__(
@@ -47,11 +48,78 @@ class CAMELAgent:
 
 import os
 
+
+
+
+
+cv = """Francisco Gerardi
+franciscogerardi@gmail.com
++37258975744
+in/francisco-gerardi/
+github.com/frnpnk
+Tallinn, Estonia
+Summary
+Developer, maker, and technologist with hands-on experience in technology, education, and research projects. Deeply passionate about
+using technology for social good and contributing to projects that have a positive impact on society and the environment. Skilled in front-
+end development, devOps, design thinking, user-centered design, and database development. Recently relocated to Tallinn and is eager to
+learn new skills and make a positive impact. Additionally, he have experience with digital fabrication (generative design), Arduino
+development, and electronics.
+PROFESSIONAL EXPERIENCE
+Mad Unicorn Fabrication – Small business owner, December 2018 – Present
+Successfully managed the production and sales of open source EFI for cars, generating revenue in Argentina.
+Developed and designed a functional WordPress website to market and sell electronic devices, establishing an online presence for
+Mad Unicorn Fabrication.
+Led a successful pivot to physical interfaces like custom keyboards, leveraging previous experience with suppliers to increase
+revenue and profitability.
+Designed and developed a Chrome extension called MIDIMapper, which allows users to map web elements to MIDI messages
+from a MIDI controller. Targeted the extension to specific use cases, such as controlling Gradio UI for Stable diffusion AI image
+generation but that is also suitable for a wide range of other websites
+EDUCATION
+Front End specialist -Digital house - March 2022 – December 2022
+React, redux, TDD, NextJs, Typescript, JUnit, Kubernetes, mongoDB, data analytics, agile methodologies, Jira, learning agility.
+Certified tech developer- Digital house - March 2021 – December 2021
+HTML, CSS, javascript, react, mySql, aws, docker, oop java, design thinking, UX/UI, Figma, git.
+Product Manager - December 2020-February 2021
+Design Thinking, Scrum, UX, Prototyping, Customer Development , KPI's and OKR's.
+Foundations of Exponential Thinking - Singularity University/UdeSA - October 2020-December 2020
+Exponential Leadership, Think Exponentially, Cognitive Biases, Moonshots
+INTERESTS/MISCELLANEOUS
+3d modeling and generative art/modeling: Solidworks Rhino, Grasshopper, Stable diffusion.
+Digital fabrication and robotics
+Native Spanish speaker; Fluent in English
+Member of LAIA - Argentinian laboratory of artificial intelligence
+
+"""
+
+jobpost = """Mid Front End Engineer
+betPawa  Estonia Remote 1 month ago  Over 200 applicants
+Full-time · Mid-Senior level
+
+We are looking for a proactive experienced front-end developer to help us conquer new growing markets. If you are bright, willing to face non-trivial challenges, and want to build great responsive UI - it might be you. Our environment is fast-paced, and ever-changing, and will suit someone who has the ability to adapt and think on their feet. In return, you will have the opportunity to work alongside a group of dedicated and smart individuals collaborating to achieve the same goal.
+
+We are looking for a Front-End developer with:
+
+The wish to learn new technologies and learn new frameworks and libraries
+Excitement to join a developing company and love a fast-paced, ever-changing environment
+Strong knowledge of JavaScript, ES6, HTML, CSS3, and corresponding ecosystems
+Knowledge of good practices preferred design patterns and writing idiomatic JavaScript code
+Experience with SASS/SCSS
+Good English skills
+
+Beneficial skills:
+
+experience with Angular, React, Vue.js (including the main modules of the ecosystem like Vuex, Vue Router, Vuelidate)
+previous work with Opera Mini (Presto/Extreme mode)
+experience with project management systems (Jira)
+experience in configuring assemblies (Webpack)
+Agile
+"""
+
 os.environ["OPENAI_API_KEY"] = ""
 
-assistant_role_name = "Python Programmer"
-user_role_name = "Stock Trader"
-task = "Develop a trading bot for the stock market"
+assistant_role_name = "IT recruiter"
+user_role_name = "HR consultant"
+task = "Analize and define the percentage of fit and posible impovments between a cv and a jobpost"
 word_limit = 50 # word limit for task brainstorming
 
 task_specifier_sys_msg = SystemMessage(content="You can make a task more specific.")
@@ -73,6 +141,8 @@ assistant_inception_prompt = (
 """Never forget you are a {assistant_role_name} and I am a {user_role_name}. Never flip roles! Never instruct me!
 We share a common interest in collaborating to successfully complete a task.
 You must help me to complete the task.
+Here is the cv:{cv}
+Here is the jobpost: {jobpost}
 Here is the task: {task}. Never forget our task!
 I must instruct you based on your expertise and my needs to complete the task.
 
@@ -95,6 +165,8 @@ user_inception_prompt = (
 """Never forget you are a {user_role_name} and I am a {assistant_role_name}. Never flip roles! You will always instruct me.
 We share a common interest in collaborating to successfully complete a task.
 I must help you to complete the task.
+Here is the cv:{cv}
+Here is the jobpost: {jobpost}
 Here is the task: {task}. Never forget our task!
 You must instruct me based on my expertise and your needs to complete the task ONLY in the following two ways:
 
@@ -119,17 +191,17 @@ When the task is completed, you must only reply with a single word <CAMEL_TASK_D
 Never say <CAMEL_TASK_DONE> unless my responses have solved your task."""
 )
 
-def get_sys_msgs(assistant_role_name: str, user_role_name: str, task: str):
+def get_sys_msgs(assistant_role_name: str, user_role_name: str, task: str, cv:str, jobpost:str):
     
     assistant_sys_template = SystemMessagePromptTemplate.from_template(template=assistant_inception_prompt)
-    assistant_sys_msg = assistant_sys_template.format_messages(assistant_role_name=assistant_role_name, user_role_name=user_role_name, task=task)[0]
+    assistant_sys_msg = assistant_sys_template.format_messages(assistant_role_name=assistant_role_name, user_role_name=user_role_name, task=task, cv=cv, jobpost=jobpost)[0]
     
     user_sys_template = SystemMessagePromptTemplate.from_template(template=user_inception_prompt)
-    user_sys_msg = user_sys_template.format_messages(assistant_role_name=assistant_role_name, user_role_name=user_role_name, task=task)[0]
+    user_sys_msg = user_sys_template.format_messages(assistant_role_name=assistant_role_name, user_role_name=user_role_name, task=task, cv=cv, jobpost=jobpost)[0]
     
     return assistant_sys_msg, user_sys_msg
 
-assistant_sys_msg, user_sys_msg = get_sys_msgs(assistant_role_name, user_role_name, specified_task)
+assistant_sys_msg, user_sys_msg = get_sys_msgs(assistant_role_name, user_role_name, specified_task, cv, jobpost)
 
 assistant_agent = CAMELAgent(assistant_sys_msg, ChatOpenAI(temperature=0.2))
 user_agent = CAMELAgent(user_sys_msg, ChatOpenAI(temperature=0.2))
@@ -150,7 +222,7 @@ user_msg = assistant_agent.step(user_msg)
 print(f"Original task prompt:\n{task}\n")
 print(f"Specified task prompt:\n{specified_task}\n")
 
-chat_turn_limit, n = 30, 0
+chat_turn_limit, n = 5, 0
 while n < chat_turn_limit:
     n += 1
     user_ai_msg = user_agent.step(assistant_msg)

@@ -115,7 +115,7 @@ experience in configuring assemblies (Webpack)
 Agile
 """
 
-os.environ["OPENAI_API_KEY"] = ""
+os.environ["OPENAI_API_KEY"] = "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"
 
 assistant_role_name = "IT recruiter"
 user_role_name = "HR consultant"
